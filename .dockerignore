@@ -1,0 +1,5 @@
+# Exclude everything by default
+*
+
+# Only include what the Dockerfile needs
+!container/ocr.py

@@ -1,0 +1,11 @@
+# Cloudflare Workers environment variables
+# Copy this file to .dev.vars and fill in your values
+
+# Required: Your Cloudflare Account ID
+# Found in the Cloudflare dashboard (right sidebar on any page)
+CLOUDFLARE_ACCOUNT_ID=your_account_id_here
+
+# Required: AI Search API token
+# Create an AI Search instance in the Cloudflare dashboard
+# Generate an API token with AI Search:read and AI Search:write permissions
+AI_SEARCH_API_TOKEN=your_ai_search_token_here

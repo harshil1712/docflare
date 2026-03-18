@@ -1,0 +1,79 @@
+@source "./node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
+@import "@cloudflare/kumo/styles";
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Instrument Serif", serif;
+  --font-sans: "Manrope", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-archival-bg: #F4F1EA;
+  --color-archival-ink: #111111;
+  --color-archival-accent: #E3342F; /* Vermillion Red */
+  --color-archival-border: rgba(17, 17, 17, 0.15);
+  --color-archival-surface: #EBE7DC;
+}
+
+body {
+	@apply m-0 bg-archival-bg text-archival-ink font-sans;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+/* Override kumo rounded corners with harsh ones */
+* {
+  border-radius: 0 !important;
+}
+
+code {
+	@apply font-mono;
+}
+
+/* Custom scrolling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-left: 1px solid var(--color-archival-border);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-archival-ink);
+}
+
+/* Animations */
+@keyframes fade-slide-up {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-slide-up {
+  animation: fade-slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-1 { animation-delay: 100ms; }
+.stagger-2 { animation-delay: 200ms; }
+.stagger-3 { animation-delay: 300ms; }
+.stagger-4 { animation-delay: 400ms; }
+
+/* Blinking cursor for thinking state */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.thinking-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1em;
+  background-color: var(--color-archival-accent);
+  animation: blink-cursor 1s step-end infinite;
+  vertical-align: text-bottom;
+}
