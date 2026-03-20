@@ -1,7 +1,7 @@
 import { AIChatAgent } from '@cloudflare/ai-chat'
 import { convertToModelMessages, pruneMessages, streamText, type UIMessage } from 'ai'
 import { createWorkersAI } from 'workers-ai-provider'
-import { AI_SEARCH_INSTANCE, MODELS } from './lib/config'
+import { AI_SEARCH_INSTANCE, MODELS, AI_SEARCH } from './lib/config'
 
 interface RetrievedChunk {
 	filename?: string
@@ -65,7 +65,7 @@ function plainTextResponse(text: string): Response {
 }
 
 export class ChatAgent extends AIChatAgent<Env> {
-	maxPersistedMessages = 200
+	maxPersistedMessages = AI_SEARCH.maxPersistedMessages
 
 	async onChatMessage(_onFinish?: unknown, options?: { abortSignal?: AbortSignal }): Promise<Response> {
 		const query = getLastUserMessageText(this.messages)
@@ -81,15 +81,16 @@ export class ChatAgent extends AIChatAgent<Env> {
 			const searchResponse = (await this.env.AI.autorag(AI_SEARCH_INSTANCE).search({
 				query,
 				rewrite_query: true,
-				max_num_results: 8,
+				max_num_results: AI_SEARCH.maxResults,
 				ranking_options: {
-					score_threshold: 0.15,
+					score_threshold: AI_SEARCH.scoreThreshold,
 				},
 			})) as { data?: RetrievedChunk[] }
 
 			chunks = searchResponse.data ?? []
 		} catch (error) {
-			console.error('AI Search query failed', error)
+			// Log only error message to avoid leaking sensitive data (stack traces, URLs, tokens)
+			console.error('AI Search query failed:', error instanceof Error ? error.message : 'Unknown error')
 			return plainTextResponse(
 				'I could not reach the search index right now. Please try again in a moment.'
 			)

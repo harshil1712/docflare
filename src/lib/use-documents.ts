@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { DocumentStatus, SidebarDocument } from '../components/Sidebar'
 import type { DocumentsResponse, IndexedDocument } from './documents'
+import { TIMEOUTS } from './config'
 
 interface UseDocumentsResult {
 	documents: IndexedDocument[]
@@ -59,12 +60,13 @@ export function useDocuments(): UseDocumentsResult {
 			return
 		}
 
-		const interval = window.setInterval(() => {
+		// Use bare setInterval/clearInterval instead of window.setInterval for SSR safety
+		const interval = setInterval(() => {
 			void refreshDocuments()
-		}, 30_000)
+		}, TIMEOUTS.documentPollIntervalMs)
 
 		return () => {
-			window.clearInterval(interval)
+			clearInterval(interval)
 		}
 	}, [documents, refreshDocuments])
 

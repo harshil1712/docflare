@@ -31,7 +31,7 @@ export function ChatInterface({
 		scrollToBottom()
 	}, [messages, scrollToBottom])
 
-	const handleSend = useCallback(async () => {
+	const handleSend = useCallback(() => {
 		if (!inputValue.trim() || isLoading) {
 			return
 		}

@@ -7,6 +7,7 @@
  */
 
 import { getSandbox, type Sandbox } from "@cloudflare/sandbox";
+import { TIMEOUTS } from "./config";
 
 export interface OCRPage {
   page: number;
@@ -40,7 +41,7 @@ export async function ocrPDF(
   // Run RapidOCR
   const result = await sandbox.exec(
     "python3 /app/ocr.py /workspace/input.pdf",
-    { timeout: 120_000 }, // 2 min timeout for large PDFs
+    { timeout: TIMEOUTS.ocr }, // Use configured timeout for large PDFs
   );
 
   if (!result.success) {
@@ -63,13 +64,11 @@ export async function ocrPDF(
 }
 
 /**
- * Convert an ArrayBuffer to a base64 string.
+ * Convert an ArrayBuffer to a base64 string using Buffer (nodejs_compat).
+ *
+ * This is O(n) and much faster than the byte-by-byte string concatenation
+ * approach, which was O(n²) due to immutable string operations.
  */
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]!);
-  }
-  return btoa(binary);
+  return Buffer.from(buffer).toString("base64");
 }

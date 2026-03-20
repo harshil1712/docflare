@@ -6,6 +6,10 @@ import { ChatAgent } from './agent'
 export { Sandbox } from '@cloudflare/sandbox'
 export { ChatAgent }
 
+// Authentication is handled by Cloudflare Access at the network layer.
+// The Worker assumes all incoming requests have already been authenticated.
+// See: https://developers.cloudflare.com/cloudflare-one/applications/configure-apps/self-hosted-apps/
+
 declare module '@tanstack/react-router' {
   interface Register {
     server: {

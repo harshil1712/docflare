@@ -1,5 +1,7 @@
 import { FileText } from '@phosphor-icons/react'
 import { cn } from '@cloudflare/kumo'
+import ReactMarkdown from 'react-markdown'
+import rehypeSanitize from 'rehype-sanitize'
 
 export interface Message {
 	id: string
@@ -46,19 +48,25 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 						</div>
 					) : (
 						<div className="font-sans text-[15px] md:text-base text-[var(--color-archival-ink)]/90 leading-relaxed max-w-3xl prose prose-neutral prose-p:my-2 prose-ul:my-2 prose-li:my-0">
-							{message.content.split('\n').map((line, i) => {
-								if (line.startsWith('- ')) {
-									return <li key={i} className="ml-4 list-disc">{line.substring(2)}</li>
-								}
-								if (line.trim() === '') {
-									return <br key={i} />
-								}
-								// Simple markdown bold parsing for the mock text
-								const formattedLine = line.split('**').map((part, j) => 
-									j % 2 === 1 ? <strong key={j} className="font-bold text-[var(--color-archival-ink)]">{part}</strong> : part
-								);
-								return <p key={i}>{formattedLine}</p>
-							})}
+							<ReactMarkdown
+								rehypePlugins={[rehypeSanitize]}
+								components={{
+									p: ({ children }) => (
+										<p className="my-2">{children}</p>
+									),
+									strong: ({ children }) => (
+										<strong className="font-bold text-[var(--color-archival-ink)]">{children}</strong>
+									),
+									ul: ({ children }) => (
+										<ul className="my-2 ml-4 list-disc">{children}</ul>
+									),
+									li: ({ children }) => (
+										<li className="my-0">{children}</li>
+									),
+								}}
+							>
+								{message.content}
+							</ReactMarkdown>
 						</div>
 					)}
 

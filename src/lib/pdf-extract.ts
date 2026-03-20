@@ -8,6 +8,7 @@
  */
 
 import type { Sandbox } from "@cloudflare/sandbox";
+import { EXTRACTION } from "./config";
 import { ocrPDF } from "./ocr-sandbox";
 
 export interface PDFExtractionResult {
@@ -20,13 +21,6 @@ export interface PDFExtractionResult {
   /** Which extraction strategy was used */
   method: "toMarkdown" | "ocr-fallback";
 }
-
-/**
- * Minimum content length (excluding metadata) to consider toMarkdown() successful.
- * Metadata alone (headers, PDF version, etc.) typically produces ~200-400 chars
- * with no actual document content.
- */
-const MIN_CONTENT_LENGTH = 50;
 
 /**
  * Extract text from a PDF. Tries toMarkdown() first (fast, free).
@@ -54,7 +48,9 @@ export async function extractTextFromPDF(
   const ocrResult = await ocrPDF(env.Sandbox, pdfBytes);
 
   if (ocrResult.error) {
-    console.error(`OCR error for ${fileName}: ${ocrResult.error}`);
+    // Log only truncated error to avoid leaking sensitive filesystem paths from sandbox stderr
+    const safeError = ocrResult.error.slice(0, 200);
+    console.error(`OCR error for ${fileName}: ${safeError}`);
   }
 
   const markdown = formatOCRResult(fileName, ocrResult.pages);
@@ -108,7 +104,7 @@ function hasSubstantialContent(markdown: string): boolean {
   // Strip whitespace and page headers like "### Page 1\n\n"
   const stripped = contentsSection.replace(/###\s+Page\s+\d+/g, "").trim();
 
-  return stripped.length >= MIN_CONTENT_LENGTH;
+  return stripped.length >= EXTRACTION.minContentLength;
 }
 
 /**

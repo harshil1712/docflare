@@ -15,6 +15,11 @@ export interface DocumentsResponse {
 }
 
 export function formatFileSize(bytes: number): string {
+	// Guard against NaN, Infinity, and negative values
+	if (!Number.isFinite(bytes) || bytes < 0) {
+		return '0 B'
+	}
+
 	if (bytes < 1024) {
 		return `${bytes} B`
 	}

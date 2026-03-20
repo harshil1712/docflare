@@ -15,18 +15,18 @@ Built on TanStack Start + Cloudflare Workers with a two-strategy PDF extraction 
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | TanStack Start (React 19, file-based routing) |
-| Runtime | Cloudflare Workers |
-| Chat Agent | `AIChatAgent` Durable Object from `@cloudflare/ai-chat` |
-| AI SDK | Vercel AI SDK + `workers-ai-provider` |
+| Layer          | Technology                                                |
+| -------------- | --------------------------------------------------------- |
+| Framework      | TanStack Start (React 19, file-based routing)             |
+| Runtime        | Cloudflare Workers                                        |
+| Chat Agent     | `AIChatAgent` Durable Object from `@cloudflare/ai-chat`   |
+| AI SDK         | Vercel AI SDK + `workers-ai-provider`                     |
 | PDF Extraction | Workers AI `toMarkdown()` + RapidOCR in Sandbox container |
-| Storage | Cloudflare R2 |
-| RAG | Cloudflare AI Search (chunking, embedding, retrieval) |
-| Generation | Workers AI (`@cf/nvidia/nemotron-3-120b-a12b`) |
-| Styling | Tailwind CSS v4 + `@cloudflare/kumo` |
-| Icons | `@phosphor-icons/react` |
+| Storage        | Cloudflare R2                                             |
+| RAG            | Cloudflare AI Search (chunking, embedding, retrieval)     |
+| Generation     | Workers AI (`@cf/nvidia/nemotron-3-120b-a12b`)            |
+| Styling        | Tailwind CSS v4 + `@cloudflare/kumo`                      |
+| Icons          | `@phosphor-icons/react`                                   |
 
 ## Prerequisites
 
@@ -41,7 +41,7 @@ Built on TanStack Start + Cloudflare Workers with a two-strategy PDF extraction 
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/yourusername/docflare.git
+git clone https://github.com/harshil1712/docflare.git
 cd docflare
 npm install
 ```
@@ -51,28 +51,21 @@ npm install
 Copy the example file and fill in your values:
 
 ```bash
-cp .dev.vars.example .dev.vars
+cp .env.example .env
 ```
 
-Edit `.dev.vars`:
+Edit `.env`:
 
-| Variable | Where to find |
-|----------|---------------|
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard (right sidebar on any page) |
-| `AI_SEARCH_API_TOKEN` | Create an AI Search instance → Generate API token with AI Search read/write |
+| Variable                | Where to find                                                               |
+| ----------------------- | --------------------------------------------------------------------------- |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard (right sidebar on any page)                            |
+| `AI_SEARCH_API_TOKEN`   | Create an AI Search instance → Generate API token with AI Search read/write |
 
 ### 3. Create Cloudflare resources
 
 **Create R2 bucket:**
 ```bash
-wrangler r2 bucket create docflare-docs
-```
-
-**Add R2 binding to `wrangler.jsonc`:**
-```json
-"r2_buckets": [
-  { "binding": "DOCS_BUCKET", "bucket_name": "docflare-docs" }
-]
+npx wrangler r2 bucket create docflare-docs
 ```
 
 **Create AI Search instance:**
@@ -80,7 +73,7 @@ wrangler r2 bucket create docflare-docs
 2. Create an instance named `docflare-search` (or update `src/lib/config.ts`)
 3. Connect it to your `docflare-docs` R2 bucket
 4. Configure path filter: include `documents/**` (excludes original PDFs from indexing)
-5. Generate an API token and add it to `.dev.vars`
+5. Generate an API token and add it to `.env`
 
 ### 4. Regenerate types
 
@@ -149,22 +142,22 @@ npm run deploy
 
 ## Environment Variables
 
-See `.dev.vars.example` for the full template.
+See `.env.example` for the full template.
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `CLOUDFLARE_ACCOUNT_ID` | Yes | Your Cloudflare account ID |
-| `AI_SEARCH_API_TOKEN` | Yes | API token for AI Search with read/write permissions |
+| Variable                | Required | Description                                         |
+| ----------------------- | -------- | --------------------------------------------------- |
+| `CLOUDFLARE_ACCOUNT_ID` | Yes      | Your Cloudflare account ID                          |
+| `AI_SEARCH_API_TOKEN`   | Yes      | API token for AI Search with read/write permissions |
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server on port 3000 |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build locally |
-| `npm run deploy` | Deploy to Cloudflare Workers |
-| `npm run test` | Run Vitest tests |
+| Command              | Description                                       |
+| -------------------- | ------------------------------------------------- |
+| `npm run dev`        | Start development server on port 3000             |
+| `npm run build`      | Build for production                              |
+| `npm run preview`    | Preview production build locally                  |
+| `npm run deploy`     | Deploy to Cloudflare Workers                      |
+| `npm run test`       | Run Vitest tests                                  |
 | `npm run cf-typegen` | Regenerate Cloudflare types from `wrangler.jsonc` |
 
 ## Configuration
@@ -186,6 +179,12 @@ Update `src/lib/config.ts` to change:
 **AI Search API errors**
 - Verify your `AI_SEARCH_API_TOKEN` has the correct permissions (AI Search:read and AI Search:write)
 - Check that your AI Search instance is connected to the correct R2 bucket
+
+## Security
+
+This application does not implement application-level authentication. It is designed to run behind [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/configure-apps/self-hosted-apps/), which handles authentication at the network layer before requests reach the Worker.
+
+If you deploy this without Cloudflare Access (or an equivalent auth proxy), all endpoints — including document upload, document listing, and the chat agent — will be publicly accessible.
 
 ## License
 
