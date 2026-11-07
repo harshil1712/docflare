@@ -24,7 +24,7 @@ Built on TanStack Start + Cloudflare Workers with a two-strategy PDF extraction 
 | PDF Extraction | Workers AI `toMarkdown()` + RapidOCR in Sandbox container |
 | Storage        | Cloudflare R2                                             |
 | RAG            | Cloudflare AI Search (chunking, embedding, retrieval)     |
-| Generation     | Workers AI (`@cf/nvidia/nemotron-3-120b-a12b`)            |
+| Generation     | Workers AI (`@cf/deepseek-ai/deepseek-v4.1-flash-1017`) |
 | Styling        | Tailwind CSS v4 + `@cloudflare/kumo`                      |
 | Icons          | `@phosphor-icons/react`                                   |
 
