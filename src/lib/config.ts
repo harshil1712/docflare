@@ -1,5 +1,5 @@
 export const MODELS = {
-  generation: "@cf/nvidia/nemotron-3-120b-a12b",
+  generation: "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
 } as const;
 
 /** AI Search instance name (configured in Cloudflare dashboard) */
